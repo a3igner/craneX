@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRANE-X Multi-Asset Sentiment Gauge</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #c9d1d9;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  .container { max-width: 1100px; width: 100%; }
+  h1 { text-align: center; font-size: 1.6em; font-weight: 600; margin-bottom: 6px; color: #f0f6fc; }
+  .subtitle { text-align: center; font-size: 0.85em; color: #8b949e; margin-bottom: 24px; }
+  .subtitle span { color: #58a6ff; }
+
+  /* ===== CSS-ONLY TOOLTIP SYSTEM ===== */
+  [data-tip] {
+    position: relative;
+    cursor: help;
+  }
+  [data-tip]::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1c2333;
+    color: #c9d1d9;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.72em;
+    font-weight: 400;
+    white-space: nowrap;
+    border: 1px solid #30363d;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+    z-index: 100;
+    max-width: 280px;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.4;
+  }
+  [data-tip]:hover::after { opacity: 1; }
+  /* Tooltip on left edge - shift right */
+  [data-tip-left] { position: relative; cursor: help; }
+  [data-tip-left]::after {
+    content: attr(data-tip-left);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    transform: none;
+    background: #1c2333;
+    color: #c9d1d9;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.72em;
+    border: 1px solid #30363d;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+    z-index: 100;
+    max-width: 280px;
+    white-space: normal;
+    line-height: 1.4;
+    text-align: left;
+  }
+  [data-tip-left]:hover::after { opacity: 1; }
+
+  /* Sentiment labels */
+  .label-bullish { color: #3fb950; font-size: 0.75em; font-weight: 600; }
+  .label-bearish { color: #f85149; font-size: 0.75em; font-weight: 600; }
+  .label-neutral { color: #d29922; font-size: 0.75em; font-weight: 600; }
+
+  /* Composite gauge */
+  .composite-section {
+    background: #161b22; border: 1px solid #30363d; border-radius: 12px;
+    padding: 24px; margin-bottom: 20px; text-align: center;
+  }
+  .composite-section h2 {
+    font-size: 0.9em; color: #8b949e; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 12px;
+  }
+  .arc-gauge { width: 200px; height: 120px; margin: 0 auto 10px; position: relative; }
+  .arc-gauge svg { width: 200px; height: 120px; }
+  .gauge-value { font-size: 2.4em; font-weight: 700; line-height: 1; }
+  .gauge-sentiment-label { font-size: 0.95em; font-weight: 600; margin-top: 2px; }
+  .gauge-label { font-size: 0.85em; color: #8b949e; margin-top: 4px; }
+  .gauge-interp {
+    font-size: 0.72em; color: #484f58; margin-top: 6px; max-width: 400px;
+    margin-left: auto; margin-right: auto; line-height: 1.4;
+  }
+  .last-updated { font-size: 0.75em; color: #484f58; margin-top: 8px; }
+
+  /* Asset cards */
+  .asset-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px;
+  }
+  @media (max-width: 800px) { .asset-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 500px) { .asset-grid { grid-template-columns: repeat(2, 1fr); } }
+  .asset-card {
+    background: #161b22; border: 1px solid #30363d; border-radius: 10px;
+    padding: 16px; text-align: center; transition: border-color 0.2s;
+  }
+  .asset-card:hover { border-color: #58a6ff; }
+  .asset-name { font-size: 1.1em; font-weight: 600; margin-bottom: 2px; }
+  .asset-full { font-size: 0.7em; color: #8b949e; margin-bottom: 8px; }
+  .asset-score { font-size: 1.8em; font-weight: 700; margin-bottom: 2px; }
+  .asset-sentiment-label { font-size: 0.75em; font-weight: 600; margin-bottom: 8px; }
+  .asset-bar { height: 4px; border-radius: 2px; background: #21262d; margin: 8px 12px; overflow: hidden; }
+  .asset-bar-fill { height: 100%; border-radius: 2px; transition: width 0.5s; }
+  .asset-vol { font-size: 0.7em; color: #484f58; margin-top: 6px; }
+  .bullish { color: #3fb950; }
+  .bearish { color: #f85149; }
+  .neutral { color: #d29922; }
+
+  /* Weight bars */
+  .weights-section {
+    background: #161b22; border: 1px solid #30363d; border-radius: 12px;
+    padding: 20px; margin-bottom: 20px;
+  }
+  .weights-section h3 { font-size: 0.85em; color: #8b949e; margin-bottom: 4px; }
+  .weights-sub { font-size: 0.75em; color: #484f58; margin-bottom: 14px; }
+  .weight-row { display: flex; align-items: center; margin-bottom: 6px; gap: 10px; }
+  .weight-label { width: 80px; font-size: 0.8em; color: #c9d1d9; }
+  .weight-bar-bg {
+    flex: 1; height: 16px; background: #21262d; border-radius: 8px; overflow: hidden;
+  }
+  .weight-bar-fill { height: 100%; border-radius: 8px; transition: width 0.5s; }
+  .weight-pct { width: 50px; text-align: right; font-size: 0.8em; font-weight: 600; }
+  .w-eodhd { background: #58a6ff; }
+  .w-stat  { background: #3fb950; }
+  .w-llm   { background: #d29922; }
+  .w-0     { background: #484f58; }
+
+  /* Regime */
+  .regime-badge {
+    display: inline-block; padding: 3px 10px; border-radius: 12px;
+    font-size: 0.75em; font-weight: 600; text-transform: uppercase;
+  }
+  .regime-bullish { background: rgba(63,185,80,0.15); color: #3fb950; border: 1px solid rgba(63,185,80,0.3); }
+  .regime-bearish { background: rgba(248,81,73,0.15); color: #f85149; border: 1px solid rgba(248,81,73,0.3); }
+  .regime-neutral { background: rgba(210,153,34,0.15); color: #d29922; border: 1px solid rgba(210,153,34,0.3); }
+  .regime-volatile { background: rgba(248,81,73,0.15); color: #f85149; border: 1px solid rgba(248,81,73,0.3); }
+
+  /* Stats row */
+  .stats-row {
+    display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 16px;
+  }
+  .stat-chip {
+    background: #21262d; border-radius: 8px; padding: 6px 14px;
+    font-size: 0.75em; color: #8b949e;
+  }
+  .stat-chip strong { color: #c9d1d9; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>CRANE-X Sentiment</h1>
+  <p class="subtitle">Multi-Asset <span>Cluster-Reactive</span> Adaptive News Ensemble</p>
+
+  <!-- Composite Gauge -->
+  <div class="composite-section">
+    <h2 data-tip="Weighted average of all 5 asset scores. Each asset is weighted by 1/volatility so calmer assets (ES, NQ) contribute more than volatile ones (BTC, ETH).">Volatility-Normalized Composite Sentiment</h2>
+    <div class="arc-gauge" data-tip="The gauge needle sweeps from bearish (left, red) through neutral (center, yellow) to bullish (right, green). The fill color and position show the current composite sentiment.">
+      <svg viewBox="0 0 200 120">
+        <path d="M 30 100 A 70 70 0 0 1 170 100" fill="none" stroke="#21262d" stroke-width="12" stroke-linecap="round"/>
+        <path id="arc-fill" d="M 30 100 A 70 70 0 0 1 170 100" fill="none" stroke="#3fb950" stroke-width="12" stroke-linecap="round" stroke-dasharray="0 220" stroke-dashoffset="0"/>
+      </svg>
+    </div>
+    <div class="gauge-value" id="composite-value">--</div>
+    <div class="gauge-sentiment-label" id="composite-label"></div>
+    <div class="gauge-label">Composite Sentiment</div>
+    <div class="gauge-interp" id="composite-interp">Score ranges from -1.0 (strongly bearish) to +1.0 (strongly bullish). &gt;+0.3 = bullish, &lt;-0.3 = bearish, in between = neutral.</div>
+    <div class="last-updated" id="last-updated">Loading...</div>
+  </div>
+
+  <!-- Asset Cards -->
+  <div class="asset-grid" id="asset-grid"></div>
+
+  <!-- Weights -->
+  <div class="weights-section">
+    <h3 data-tip="Each asset has its own ensemble weights, optimized every 6 hours via Spearman rank correlation between each signal and the realized 24h price move.">Ensemble Weights</h3>
+    <div class="weights-sub">How much each signal contributes — independently calibrated per asset</div>
+    <div id="weights-content"></div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row" id="stats-row"></div>
+</div>
+
+<script src="config.js"></script>
+<script>
+const API_URL = (typeof CRANEX_API_URL !== 'undefined')
+  ? CRANEX_API_URL
+  : 'https://tradeflags.com/NewsFeed/public/api/multisentiment-cranex';
+
+function scoreColor(s) {
+  if (s === null || s === undefined) return '#8b949e';
+  if (s > 0.3) return '#3fb950';
+  if (s < -0.3) return '#f85149';
+  return '#d29922';
+}
+
+function scoreClass(s) {
+  if (s === null || s === undefined) return 'neutral';
+  if (s > 0.3) return 'bullish';
+  if (s < -0.3) return 'bearish';
+  return 'neutral';
+}
+
+function sentimentLabel(s) {
+  if (s === null || s === undefined) return '—';
+  if (s > 0.3) return 'BULLISH';
+  if (s < -0.3) return 'BEARISH';
+  return 'NEUTRAL';
+}
+
+function sentimentExplanation(s) {
+  if (s === null || s === undefined) return 'No data available.';
+  if (s > 0.5) return 'Strong bullish signal — news sentiment is decisively positive. Markets are reacting favorably to current narratives.';
+  if (s > 0.3) return 'Moderately bullish — news sentiment is leaning positive. Markets show cautious optimism.';
+  if (s > 0.1) return 'Slightly bullish — news sentiment is mildly positive but not yet decisive.';
+  if (s > -0.1) return 'Neutral — mixed signals. News sentiment is balanced, no strong directional bias.';
+  if (s > -0.3) return 'Slightly bearish — news sentiment is mildly negative but not alarming.';
+  if (s > -0.5) return 'Moderately bearish — negative sentiment is building. Markets may be pricing in concerns.';
+  return 'Strong bearish signal — news sentiment is decisively negative. Markets are reacting to adverse conditions.';
+}
+
+function gaugeAngle(val) {
+  const clamped = Math.max(-1, Math.min(1, val || 0));
+  return ((clamped + 1) / 2) * 220;
+}
+
+function updateGauge(val) {
+  const fill = document.getElementById('arc-fill');
+  const display = document.getElementById('composite-value');
+  const label = document.getElementById('composite-label');
+  const interp = document.getElementById('composite-interp');
+  const angle = gaugeAngle(val);
+  fill.setAttribute('stroke-dasharray', `${angle} 220`);
+  fill.setAttribute('stroke', scoreColor(val));
+  display.textContent = val !== null && val !== undefined ? val.toFixed(3) : '--';
+  display.style.color = scoreColor(val);
+  label.textContent = sentimentLabel(val);
+  label.style.color = scoreColor(val);
+  interp.textContent = sentimentExplanation(val);
+}
+
+const ASSET_NAMES = {
+  es: { sym: 'ES',  name: 'S&P 500 E-mini Futures',
+    tip: 'Tracks the S&P 500 index. The broadest measure of US large-cap equity market sentiment.' },
+  nq: { sym: 'NQ',  name: 'Nasdaq 100 E-mini Futures',
+    tip: 'Tracks the Nasdaq 100 index. Heavy technology/growth stock exposure. More volatile than ES.' },
+  cl: { sym: 'CL',  name: 'Crude Oil Futures',
+    tip: 'Tracks Brent crude oil futures. Sensitive to supply disruptions, geopolitical events, and global demand.' },
+  btc:{ sym: 'BTC', name: 'Bitcoin USD',
+    tip: 'Bitcoin price in USD. Highly volatile (2-4x ES). Reacts to regulation, adoption, macro liquidity.' },
+  eth:{ sym: 'ETH', name: 'Ethereum USD',
+    tip: 'Ethereum price in USD. Correlated with BTC but also sensitive to blockchain-specific catalysts.' },
+};
+
+const SIGNAL_LABELS = {
+  eodhd: 'TFLLM',
+  stat:  'StatCluster',
+  llm:   'extLLM',
+};
+
+const SIGNAL_TIPS = {
+  eodhd: 'Proprietary financial sentiment score from the news article text. Range -1 (negative) to +1 (positive).',
+  stat:  'CRANE-X statistical TF-IDF cluster learner. Assigns each article to a semantic neighborhood and reads that cluster\'s historical average price reaction.',
+  llm:   'LLM-based sentiment score via DeepSeek zero-shot classification on article title + full content.',
+};
+
+function parseApiData(arr) {
+  if (!Array.isArray(arr) || arr.length === 0) return null;
+  const out = { scores: {}, weights: {}, regimes: {}, vols: {}, composite_score: 0, n_articles: 0, articles_since: 0 };
+  const row0 = arr[0];
+  out.composite_score = parseFloat(row0.avg_composite) || 0;
+  out.n_articles = parseInt(row0.n_articles) || 0;
+  out.articles_since = parseInt(row0.stats_30m_count) || 0;
+  for (const row of arr) {
+    const a = row.asset;
+    out.scores[a] = parseFloat(row['avg_' + a]) || 0;
+    out.weights[a] = {
+      eodhd: parseFloat(row.w_eodhd) || 0.5,
+      stat: parseFloat(row.w_stat) || 0.5,
+      llm: parseFloat(row.w_llm) || 0,
+    };
+    out.regimes[a] = row.regime || 'neutral';
+    out.vols[a] = parseFloat(row.annualized_vol) || (ASSET_NAMES[a] ? 15 : 15);
+  }
+  return out;
+}
+
+function renderAssets(d) {
+  const grid = document.getElementById('asset-grid');
+  let html = '';
+  for (const [key, info] of Object.entries(ASSET_NAMES)) {
+    const s = d.scores[key] || 0;
+    const pct = ((s + 1) / 2 * 100);
+    const vol = d.vols[key] || info.vol || 15;
+    const cls = scoreClass(s);
+    const label = sentimentLabel(s);
+    html += `
+      <div class="asset-card" data-tip="${info.tip} Score: ${s.toFixed(3)}. ${sentimentExplanation(s)}">
+        <div class="asset-name ${cls}" data-tip="${info.tip}">${info.sym}</div>
+        <div class="asset-full">${info.name}</div>
+        <div class="asset-score ${cls}">${s.toFixed(3)}</div>
+        <div class="asset-sentiment-label ${cls}">${label}</div>
+        <div class="asset-bar" data-tip="Visual bar from -1 (left) to +1 (right). Currently at ${pct.toFixed(0)}% of bullish range.">
+          <div class="asset-bar-fill" style="width:${pct}%;background:${scoreColor(s)}"></div>
+        </div>
+        <div class="asset-vol" data-tip="Annualized realized volatility. Higher vol = less reliable signal in the composite. BTC/ETH naturally have higher vol than ES/NQ.">vol: ${vol.toFixed(1)}%</div>
+      </div>`;
+  }
+  grid.innerHTML = html;
+}
+
+function renderWeights(d) {
+  const container = document.getElementById('weights-content');
+  if (!d.weights || !d.weights.es) {
+    container.innerHTML = '<p style="color:#484f58;font-size:0.85em;" data-tip="Calibration runs every 6 hours once enough articles with price data have accumulated.">Calibration data pending...</p>';
+    return;
+  }
+  let html = '';
+  for (const [asset, w] of Object.entries(d.weights)) {
+    const info = ASSET_NAMES[asset];
+    if (!info) continue;
+    html += `<div style="margin-bottom:10px;" data-tip="Weights for ${info.sym}. Optimized via Spearman rank correlation vs realized 24h price moves. Minimum 5% per signal (diversity floor).">
+      <div style="font-size:0.8em;font-weight:600;margin-bottom:4px;color:#c9d1d9;">${info.sym}</div>`;
+    for (const [sig, pct] of Object.entries(w)) {
+      if (sig === 'llm' && pct === 0) continue;
+      const barPct = (pct * 100).toFixed(1);
+      html += `<div class="weight-row" data-tip="${SIGNAL_TIPS[sig] || ''}">
+        <div class="weight-label">${SIGNAL_LABELS[sig] || sig}</div>
+        <div class="weight-bar-bg">
+          <div class="weight-bar-fill w-${sig}" style="width:${barPct}%"></div>
+        </div>
+        <div class="weight-pct">${barPct}%</div>
+      </div>`;
+    }
+    html += '</div>';
+  }
+  container.innerHTML = html;
+}
+
+function renderStats(d) {
+  const row = document.getElementById('stats-row');
+  let html = `<div class="stat-chip" data-tip="Total articles scored in the last 2 hours by the CRANE-X ensemble scorer.">Articles scored: <strong>${d.n_articles}</strong></div>`;
+  html += `<div class="stat-chip" data-tip="Articles ingested in the last 30 minutes. Shows how active the news pipeline is right now.">Last 30 min: <strong>${d.articles_since}</strong></div>`;
+  for (const [asset, regime] of Object.entries(d.regimes)) {
+    const info = ASSET_NAMES[asset];
+    if (!info) continue;
+    html += `<div class="stat-chip" data-tip="Detected market regime for ${info.sym} based on recent 24h realized price move distribution. Bullish = positive avg, Bearish = negative avg, Volatile = extreme spread, Neutral = mixed.">${info.sym}: <span class="regime-badge regime-${regime}">${regime}</span></div>`;
+  }
+  row.innerHTML = html;
+}
+
+function fetchData() {
+  fetch(API_URL)
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+    .then(arr => {
+      const d = parseApiData(arr);
+      if (!d) throw new Error('Empty response');
+      updateGauge(d.composite_score);
+      renderAssets(d);
+      renderWeights(d);
+      renderStats(d);
+      document.getElementById('last-updated').textContent = `Updated: ${new Date().toLocaleTimeString()}`;
+    })
+    .catch(err => {
+      document.getElementById('last-updated').textContent = `Error: ${err.message} — retrying in 30s`;
+    });
+}
+
+fetchData();
+setInterval(fetchData, 30000);
+</script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+# CRANE-X .gitignore
+# ===================
+# Secrets and local configuration — never commit these.
+
+# API keys, DB credentials, tokens
+.env
+
+# API endpoint config with real URLs and tokens
+config.yaml
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# OS junk
+.DS_Store
+._*
+Thumbs.db
+
+# Model description files
+*.eng

@@ -1,0 +1,54 @@
+# CRANE-X Configuration — EXAMPLE FILE
+# =====================================
+# Copy this to config.yaml and edit with your actual endpoints.
+# config.yaml is gitignored; this file is safe to commit.
+#
+# Secrets (API keys, tokens) go in .env — not in this file.
+
+api:
+  # EODHD News API endpoint
+  eodhd:
+    base_url: "https://eodhd.com/api/news"
+
+  # DeepSeek API endpoint
+  deepseek:
+    base_url: "https://api.deepseek.com/chat/completions"
+    model: "deepseek-v4-flash"
+
+  # External price API for real-time snapshots (replace with your provider)
+  wsj_dylan:
+    base_url: "https://your-price-api.example.com/endpoint"
+    entitlement_token: "your_token_here"
+    ckey: "your_ckey_here"
+
+  # CRANE-X Gauge — live sentiment dashboard
+  gauge:
+    api_url: "https://your-domain.com/your-gauge-api-endpoint"
+    gauge_url: "https://your-domain.com/gauge.html"
+
+# Pipeline parameters
+pipeline:
+  max_headline_age_minutes: 60
+  batch_size: 4
+  max_per_run: 200
+  check_interval_seconds: 30
+  poll_interval_seconds: 1.0
+  deepseek_timeout: 60
+  eodhd_timeout: 30
+  dylan_timeout: 10
+
+# WSJ Dylan ticker mappings (instrument_id, price_col, pct_col)
+wsj_tickers:
+  - ["Future-US-ES00", "esf", "pc_esf"]
+  - ["Future-US-NQ00", "nqf", "pc_nqf"]
+  - ["Future-UK-BRN00", "clf", "pc_clf"]
+  - ["CryptoCurrency-US-BTCUSD", "btc", "pc_btc"]
+  - ["CryptoCurrency-US-ETHUSD", "eth", "pc_eth"]
+
+# Assets tracked by the ensemble
+assets:
+  - es
+  - nq
+  - cl
+  - btc
+  - eth

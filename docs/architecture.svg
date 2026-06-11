@@ -1,0 +1,225 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 680" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0a0a1a"/>
+      <stop offset="100%" stop-color="#0d1117"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#0891b2"/>
+    </linearGradient>
+    <linearGradient id="emerald" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="violet" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="amber" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <linearGradient id="rose" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fb7185"/>
+      <stop offset="100%" stop-color="#e11d48"/>
+    </linearGradient>
+    <linearGradient id="slate" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#94a3b8"/>
+      <stop offset="100%" stop-color="#64748b"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glowSoft">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+      <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#1e293b" stroke-width="0.5" opacity="0.4"/>
+    </pattern>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+    <marker id="arrowCyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#22d3ee"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="680" fill="url(#bg)"/>
+  <rect width="900" height="680" fill="url(#grid)"/>
+
+  <!-- Title -->
+  <text x="450" y="35" text-anchor="middle" fill="#e2e8f0" font-family="system-ui,-apple-system,sans-serif" font-size="16" font-weight="700">CRANE-X Architecture</text>
+  <text x="450" y="52" text-anchor="middle" fill="#64748b" font-family="system-ui,-apple-system,sans-serif" font-size="10">CPU-Native 3-Signal Sentiment Ensemble — Pipeline Flow</text>
+
+  <!-- ============ LAYER 1: DATA INGESTION ============ -->
+  
+  <!-- Section label -->
+  <text x="30" y="82" fill="#64748b" font-family="monospace" font-size="9" font-weight="600">DATA INGESTION</text>
+  <line x1="30" y1="86" x2="870" y2="86" stroke="#1e293b" stroke-width="1"/>
+
+  <!-- EODHD News API -->
+  <rect x="40" y="96" width="200" height="54" rx="6" fill="#0f172a" stroke="#94a3b8" stroke-width="1.5"/>
+  <rect x="40" y="96" width="200" height="54" rx="6" fill="rgba(30,41,59,0.5)"/>
+  <text x="140" y="117" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="11" font-weight="700">EODHD News API</text>
+  <text x="140" y="132" text-anchor="middle" fill="#64748b" font-family="system-ui,sans-serif" font-size="8">16 topic queues · 15-min polls</text>
+  <text x="140" y="143" text-anchor="middle" fill="#64748b" font-family="system-ui,sans-serif" font-size="8">VADER sentiment inline</text>
+
+  <!-- Arrow -->
+  <line x1="240" y1="123" x2="290" y2="123" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- External Price API -->
+  <rect x="300" y="96" width="200" height="54" rx="6" fill="#0f172a" stroke="#94a3b8" stroke-width="1.5"/>
+  <rect x="300" y="96" width="200" height="54" rx="6" fill="rgba(30,41,59,0.5)"/>
+  <text x="400" y="117" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="11" font-weight="700">Price Snapshots</text>
+  <text x="400" y="132" text-anchor="middle" fill="#64748b" font-family="system-ui,sans-serif" font-size="8">Futures · Crypto · Real-time</text>
+  <text x="400" y="143" text-anchor="middle" fill="#64748b" font-family="system-ui,sans-serif" font-size="8">ES · NQ · CL · BTC · ETH</text>
+
+  <!-- Arrow from price API downward into ingestion -->
+  <line x1="400" y1="150" x2="400" y2="170" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Ingestion Box -->
+  <rect x="560" y="96" width="200" height="54" rx="6" fill="#0f172a" stroke="#34d399" stroke-width="1.5"/>
+  <rect x="560" y="96" width="200" height="54" rx="6" fill="rgba(6,78,59,0.4)"/>
+  <text x="660" y="117" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="11" font-weight="700">Ingestion Daemon</text>
+  <text x="660" y="132" text-anchor="middle" fill="#6ee7b7" font-family="system-ui,sans-serif" font-size="8">eodhd_daemon.py</text>
+  <text x="660" y="143" text-anchor="middle" fill="#6ee7b7" font-family="system-ui,sans-serif" font-size="8">Freshness filter ≤60 min</text>
+
+  <!-- Arrow from EODHD to Ingestion -->
+  <line x1="240" y1="123" x2="290" y2="123" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)" opacity="0"/>
+  <path d="M 240 123 Q 400 105 560 123" fill="none" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Arrow from ingestion to DB -->
+  <line x1="760" y1="123" x2="810" y2="123" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Database -->
+  <rect x="820" y="90" width="56" height="66" rx="8" fill="#0f172a" stroke="#a78bfa" stroke-width="1.5"/>
+  <rect x="820" y="90" width="56" height="66" rx="8" fill="rgba(76,29,149,0.4)"/>
+  <text x="848" y="113" text-anchor="middle" fill="#a78bfa" font-family="monospace" font-size="9">MySQL</text>
+  <text x="848" y="125" text-anchor="middle" fill="#c4b5fd" font-family="system-ui,sans-serif" font-size="7">news</text>
+  <text x="848" y="135" text-anchor="middle" fill="#c4b5fd" font-family="system-ui,sans-serif" font-size="7">+ scores</text>
+  <text x="848" y="145" text-anchor="middle" fill="#c4b5fd" font-family="system-ui,sans-serif" font-size="7">+ calib</text>
+
+  <!-- ============ LAYER 2: SCORING PIPELINE ============ -->
+  
+  <text x="30" y="195" fill="#64748b" font-family="monospace" font-size="9" font-weight="600">SCORING PIPELINE</text>
+  <line x1="30" y1="199" x2="870" y2="199" stroke="#1e293b" stroke-width="1"/>
+
+  <!-- Signal 1: EODHD Sentiment -->
+  <rect x="40" y="212" width="220" height="62" rx="6" fill="#0f172a" stroke="#22d3ee" stroke-width="1.5"/>
+  <rect x="40" y="212" width="220" height="62" rx="6" fill="rgba(8,51,68,0.4)"/>
+  <text x="150" y="232" text-anchor="middle" fill="#22d3ee" font-family="monospace" font-size="11" font-weight="600">Signal 1 · TFLLM</text>
+  <text x="150" y="248" text-anchor="middle" fill="#67e8f9" font-family="system-ui,sans-serif" font-size="8">EODHD VADER polarity</text>
+  <text x="150" y="260" text-anchor="middle" fill="#67e8f9" font-family="system-ui,sans-serif" font-size="8">Pre-baked · -1 to +1</text>
+  <text x="150" y="270" text-anchor="middle" fill="#67e8f9" font-family="system-ui,sans-serif" font-size="8">No GPU needed</text>
+
+  <!-- Signal 2: StatCluster -->
+  <rect x="300" y="212" width="220" height="62" rx="6" fill="#0f172a" stroke="#fbbf24" stroke-width="1.5"/>
+  <rect x="300" y="212" width="220" height="62" rx="6" fill="rgba(120,53,15,0.3)"/>
+  <text x="410" y="232" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="11" font-weight="600">Signal 2 · StatCluster</text>
+  <text x="410" y="248" text-anchor="middle" fill="#fde68a" font-family="system-ui,sans-serif" font-size="8">TF-IDF greedy clustering</text>
+  <text x="410" y="260" text-anchor="middle" fill="#fde68a" font-family="system-ui,sans-serif" font-size="8">245 active clusters</text>
+  <text x="410" y="270" text-anchor="middle" fill="#fde68a" font-family="system-ui,sans-serif" font-size="8">EMA drift α=0.05</text>
+
+  <!-- Signal 3: extLLM -->
+  <rect x="560" y="212" width="220" height="62" rx="6" fill="#0f172a" stroke="#fb7185" stroke-width="1.5"/>
+  <rect x="560" y="212" width="220" height="62" rx="6" fill="rgba(136,19,55,0.4)"/>
+  <text x="670" y="232" text-anchor="middle" fill="#fb7185" font-family="monospace" font-size="11" font-weight="600">Signal 3 · extLLM</text>
+  <text x="670" y="248" text-anchor="middle" fill="#fda4af" font-family="system-ui,sans-serif" font-size="8">DeepSeek V4 Flash zero-shot</text>
+  <text x="670" y="260" text-anchor="middle" fill="#fda4af" font-family="system-ui,sans-serif" font-size="8">Full article ~700 words</text>
+  <text x="670" y="270" text-anchor="middle" fill="#fda4af" font-family="system-ui,sans-serif" font-size="8">~$0.0006 per 4 articles</text>
+
+  <!-- Arrows from DB to each signal -->
+  <path d="M 848 156 L 848 178 Q 848 190 150 190 L 150 212" fill="none" stroke="#64748b" stroke-width="1" marker-end="url(#arrow)"/>
+  <path d="M 848 178 Q 848 190 410 190 L 410 212" fill="none" stroke="#64748b" stroke-width="1" marker-end="url(#arrow)"/>
+  <path d="M 848 178 Q 848 190 670 190 L 670 212" fill="none" stroke="#64748b" stroke-width="1" marker-end="url(#arrow)"/>
+
+  <!-- ============ LAYER 3: ENSEMBLE ENGINE ============ -->
+  
+  <text x="30" y="315" fill="#64748b" font-family="monospace" font-size="9" font-weight="600">ENSEMBLE ENGINE</text>
+  <line x1="30" y1="319" x2="870" y2="319" stroke="#1e293b" stroke-width="1"/>
+
+  <!-- Arrows from signals to ensemble -->
+  <path d="M 150 274 L 150 340 L 240 340" fill="none" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M 410 274 L 410 340 L 240 340" fill="none" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M 670 274 L 670 340" fill="none" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Ensemble Box -->
+  <rect x="250" y="328" width="410" height="64" rx="8" fill="#0f172a" stroke="#34d399" stroke-width="2" filter="url(#glowSoft)"/>
+  <rect x="250" y="328" width="410" height="64" rx="8" fill="rgba(6,78,59,0.3)"/>
+  <text x="455" y="350" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="13" font-weight="700">Ensemble · Weighted Signal Fusion</text>
+  <text x="455" y="366" text-anchor="middle" fill="#6ee7b7" font-family="system-ui,sans-serif" font-size="9">Spearman ρ optimization · Softmax · Diversity floor 5%</text>
+  <text x="455" y="380" text-anchor="middle" fill="#6ee7b7" font-family="system-ui,sans-serif" font-size="9">5 independent weight sets (ES · NQ · CL · BTC · ETH)</text>
+
+  <!-- Arrow from calibrate back to ensemble -->
+  <path d="M 670 360 L 720 360" fill="none" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Calibration Box -->
+  <rect x="730" y="328" width="140" height="64" rx="6" fill="#0f172a" stroke="#a78bfa" stroke-width="1.5"/>
+  <rect x="730" y="328" width="140" height="64" rx="6" fill="rgba(76,29,149,0.3)"/>
+  <text x="800" y="350" text-anchor="middle" fill="#a78bfa" font-family="monospace" font-size="10" font-weight="600">Calibrate</text>
+  <text x="800" y="366" text-anchor="middle" fill="#c4b5fd" font-family="system-ui,sans-serif" font-size="8">Every 6h</text>
+  <text x="800" y="378" text-anchor="middle" fill="#c4b5fd" font-family="system-ui,sans-serif" font-size="8">24h realized returns</text>
+
+  <!-- ============ LAYER 4: OUTPUT ============ -->
+  
+  <text x="30" y="435" fill="#64748b" font-family="monospace" font-size="9" font-weight="600">OUTPUT</text>
+  <line x1="30" y1="439" x2="870" y2="439" stroke="#1e293b" stroke-width="1"/>
+
+  <!-- Arrow from ensemble to output -->
+  <line x1="455" y1="392" x2="455" y2="452" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Composite Score -->
+  <rect x="300" y="452" width="300" height="48" rx="8" fill="#0f172a" stroke="#22d3ee" stroke-width="2" filter="url(#glow)"/>
+  <rect x="300" y="452" width="300" height="48" rx="8" fill="rgba(8,51,68,0.5)"/>
+  <text x="450" y="474" text-anchor="middle" fill="#22d3ee" font-family="monospace" font-size="12" font-weight="700">Volatility-Normalized Composite</text>
+  <text x="450" y="490" text-anchor="middle" fill="#67e8f9" font-family="system-ui,sans-serif" font-size="9">Σ(scoreᵢ / σᵢ) / Σ(1/σᵢ) — calm assets weighted higher</text>
+
+  <!-- Arrow to gauge -->
+  <line x1="450" y1="500" x2="450" y2="530" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Live Gauge -->
+  <rect x="280" y="532" width="340" height="44" rx="20" fill="#0f172a" stroke="#fbbf24" stroke-width="1.5"/>
+  <rect x="280" y="532" width="340" height="44" rx="20" fill="rgba(120,53,15,0.3)"/>
+  <text x="450" y="554" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="11" font-weight="600">Live Sentiment Gauge</text>
+  <text x="450" y="568" text-anchor="middle" fill="#fde68a" font-family="system-ui,sans-serif" font-size="9">tradeflags.com/cranex-gauge.html</text>
+
+  <!-- Per-asset scores row -->
+  <rect x="40" y="532" width="100" height="44" rx="8" fill="#0f172a" stroke="#64748b" stroke-width="1"/>
+  <rect x="40" y="532" width="100" height="44" rx="8" fill="rgba(30,41,59,0.3)"/>
+  <text x="90" y="553" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="9">ES · NQ · CL</text>
+  <text x="90" y="568" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="9">BTC · ETH</text>
+
+  <rect x="640" y="532" width="100" height="44" rx="8" fill="#0f172a" stroke="#64748b" stroke-width="1"/>
+  <rect x="640" y="532" width="100" height="44" rx="8" fill="rgba(30,41,59,0.3)"/>
+  <text x="690" y="553" text-anchor="middle" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="9">~$0.10 / run</text>
+  <text x="690" y="568" text-anchor="middle" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="9">~$5 / month</text>
+
+  <!-- ============ FOOTER / LEGEND ============ -->
+  <line x1="30" y1="610" x2="870" y2="610" stroke="#1e293b" stroke-width="1"/>
+  
+  <rect x="40" y="622" width="12" height="12" rx="2" fill="rgba(8,51,68,0.4)" stroke="#22d3ee" stroke-width="1"/>
+  <text x="56" y="632" fill="#64748b" font-family="system-ui,sans-serif" font-size="8">TFLLM (VADER)</text>
+  
+  <rect x="160" y="622" width="12" height="12" rx="2" fill="rgba(120,53,15,0.3)" stroke="#fbbf24" stroke-width="1"/>
+  <text x="176" y="632" fill="#64748b" font-family="system-ui,sans-serif" font-size="8">StatCluster</text>
+  
+  <rect x="290" y="622" width="12" height="12" rx="2" fill="rgba(136,19,55,0.4)" stroke="#fb7185" stroke-width="1"/>
+  <text x="306" y="632" fill="#64748b" font-family="system-ui,sans-serif" font-size="8">extLLM (DeepSeek)</text>
+
+  <rect x="420" y="622" width="12" height="12" rx="2" fill="rgba(6,78,59,0.3)" stroke="#34d399" stroke-width="1"/>
+  <text x="436" y="632" fill="#64748b" font-family="system-ui,sans-serif" font-size="8">Ensemble</text>
+
+  <rect x="530" y="622" width="12" height="12" rx="2" fill="rgba(76,29,149,0.3)" stroke="#a78bfa" stroke-width="1"/>
+  <text x="546" y="632" fill="#64748b" font-family="system-ui,sans-serif" font-size="8">Calibration</text>
+
+  <rect x="650" y="622" width="12" height="12" rx="2" fill="rgba(30,41,59,0.3)" stroke="#94a3b8" stroke-width="1"/>
+  <text x="666" y="632" fill="#64748b" font-family="system-ui,sans-serif" font-size="8">External Data</text>
+
+  <!-- Cost tag -->
+  <rect x="40" y="645" width="820" height="24" rx="4" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+  <text x="450" y="661" text-anchor="middle" fill="#64748b" font-family="system-ui,sans-serif" font-size="9">CPU-only · No GPU · ~1,500 lines Python · Single-server deployment · Apache 2.0</text>
+</svg>
